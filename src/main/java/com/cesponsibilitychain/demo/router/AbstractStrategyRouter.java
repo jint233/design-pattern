@@ -1,7 +1,8 @@
 package com.cesponsibilitychain.demo.router;
 
-import com.cesponsibilitychain.demo.handler.DefaultHandler;
 import com.cesponsibilitychain.demo.handler.StrategyHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +20,9 @@ import java.util.Objects;
  */
 @Component
 public abstract class AbstractStrategyRouter<T, R> {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractStrategyRouter.class);
+
     /**
      * 策略映射器，根据指定的入参路由到对应的策略处理者。
      *
@@ -46,8 +50,8 @@ public abstract class AbstractStrategyRouter<T, R> {
         Objects.requireNonNull(strategyMapper, "strategyMapper cannot be null");
     }
 
-
-    protected final StrategyHandler<T, R> defaultStrategyHandler = new DefaultHandler();
+    @SuppressWarnings("unchecked")
+    protected final StrategyHandler<T, R> defaultStrategyHandler = StrategyHandler.DEFAULT;
 
     /**
      * 执行策略，框架会自动根据策略分发至下游的 Handler 进行处理
@@ -57,10 +61,12 @@ public abstract class AbstractStrategyRouter<T, R> {
      */
     public R applyStrategy(T param) {
         final StrategyHandler<T, R> strategyHandler = strategyMapper.get(param);
-        if (strategyHandler != null) {
-            return strategyHandler.apply(param);
+        if (Objects.isNull(strategyHandler)) {
+            log.error("no such handler!");
+            return defaultStrategyHandler.apply(param);
         }
-        return defaultStrategyHandler.apply(param);
+        return strategyHandler.apply(param);
+
     }
 
     /**
@@ -69,4 +75,5 @@ public abstract class AbstractStrategyRouter<T, R> {
      * @return 分发逻辑 Mapper 对象
      */
     protected abstract StrategyMapper<T, R> registerStrategyMapper();
+
 }

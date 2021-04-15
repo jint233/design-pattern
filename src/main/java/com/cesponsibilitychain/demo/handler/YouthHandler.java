@@ -13,12 +13,13 @@ import org.springframework.stereotype.Component;
  * @intention: youth时处理Handler
  */
 @Component
+@SuppressWarnings("rawtypes")
 public class YouthHandler implements StrategyHandler {
     @Override
     public Object apply(Object param) {
         Person person = (Person) param;
-        return new StringBuilder().append("I am ").append(person.getName()).append(", ")
-                .append(person.getAge()).append(" years old").append(",")
-                .append("I am youth").toString();
+        return "I am " + person.getName() + ", " +
+                person.getAge() + " years old" + "," +
+                "I am youth";
     }
 }

@@ -26,6 +26,7 @@ import java.util.HashMap;
  * 在拦截逻辑后直接调用本身 Router 的 public R applyStrategy(T param) 方法路由给下游节点即可。
  */
 @Component
+@SuppressWarnings({"unchecked","rawtypes"})
 public class TeenagerHandlerRouter extends AbstractStrategyRouter implements StrategyHandler {
     private static final Logger log = LoggerFactory.getLogger(TeenagerHandlerRouter.class);
 
@@ -35,7 +36,8 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter implements Str
 
 
     @Autowired
-    public TeenagerHandlerRouter(FemaleHandler femaleHandler, MaleHandler maleHandler) {
+    public TeenagerHandlerRouter(FemaleHandler femaleHandler,
+                                 MaleHandler maleHandler) {
         this.femaleHandler = femaleHandler;
         this.maleHandler = maleHandler;
     }
@@ -56,7 +58,7 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter implements Str
         if (!"male".equalsIgnoreCase(person.getSex()) &&
                 !"female".equalsIgnoreCase(person.getSex())) {
             log.error("sex property is error！");
-            return defaultStrategyHandler.apply(param);
+            return StrategyHandler.DEFAULT.apply(param);
         }
         return applyStrategy(param);
     }
