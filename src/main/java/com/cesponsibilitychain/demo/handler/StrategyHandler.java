@@ -7,10 +7,6 @@ package com.cesponsibilitychain.demo.handler;
  * @param <R> 策略的返回值类型
  */
 public interface StrategyHandler<T, R> {
-
-    @SuppressWarnings("rawtypes")
-    StrategyHandler DEFAULT = t -> "I am default response";
-
     /**
      * apply strategy
      *

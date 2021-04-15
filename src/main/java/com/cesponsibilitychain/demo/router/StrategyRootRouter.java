@@ -28,12 +28,8 @@ public class StrategyRootRouter extends AbstractStrategyRouter {
 
     private final OldHandler oldHandler;
 
-
     @Autowired
-    public StrategyRootRouter(YouthHandler youthHandler,
-                              TeenagerHandlerRouter teenagerHandlerRouter,
-                              MiddleAgedHandler middleAgedHandler,
-                              OldHandler oldHandler) {
+    public StrategyRootRouter(YouthHandler youthHandler, TeenagerHandlerRouter teenagerHandlerRouter, MiddleAgedHandler middleAgedHandler, OldHandler oldHandler) {
         this.youthHandler = youthHandler;
         this.teenagerHandlerRouter = teenagerHandlerRouter;
         this.middleAgedHandler = middleAgedHandler;
@@ -45,10 +41,6 @@ public class StrategyRootRouter extends AbstractStrategyRouter {
         return param -> {
             if (param instanceof Person) {
                 int age = ((Person) param).getAge();
-                if (age <= 0) {
-                    log.error("req param is error");
-                    return StrategyHandler.DEFAULT;
-                }
                 if (age < 18) {
                     return youthHandler;
                 } else if (age < 35) {
@@ -58,10 +50,9 @@ public class StrategyRootRouter extends AbstractStrategyRouter {
                 } else {
                     return oldHandler;
                 }
-            } else {
-                log.error("Strategy can not deal this req!");
-                return StrategyHandler.DEFAULT;
             }
+            log.error("Strategy can not deal this req!");
+            return new DefaultHandler();
         };
     }
 }

@@ -35,8 +35,7 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter implements Str
 
 
     @Autowired
-    public TeenagerHandlerRouter(FemaleHandler femaleHandler,
-                                 MaleHandler maleHandler) {
+    public TeenagerHandlerRouter(FemaleHandler femaleHandler, MaleHandler maleHandler) {
         this.femaleHandler = femaleHandler;
         this.maleHandler = maleHandler;
     }
@@ -57,7 +56,7 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter implements Str
         if (!"male".equalsIgnoreCase(person.getSex()) &&
                 !"female".equalsIgnoreCase(person.getSex())) {
             log.error("sex property is error！");
-            return StrategyHandler.DEFAULT.apply(param);
+            return defaultStrategyHandler.apply(param);
         }
         return applyStrategy(param);
     }
