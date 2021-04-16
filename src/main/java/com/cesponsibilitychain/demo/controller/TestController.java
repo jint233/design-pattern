@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @intention:
  */
 @RestController
+@SuppressWarnings({"unchecked"})
 public class TestController {
 
     private final StrategyRootRouter register;
