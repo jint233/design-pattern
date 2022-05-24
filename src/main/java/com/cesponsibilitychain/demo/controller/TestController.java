@@ -2,10 +2,10 @@ package com.cesponsibilitychain.demo.controller;
 
 
 import com.cesponsibilitychain.demo.dto.Person;
-import com.cesponsibilitychain.demo.dto.User;
 import com.cesponsibilitychain.demo.router.StrategyRootRouter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @intention:
  */
 @RestController
-@SuppressWarnings({"unchecked"})
 public class TestController {
 
     private final StrategyRootRouter register;
@@ -29,13 +28,8 @@ public class TestController {
 
 
     @GetMapping("/test")
-    public String test(Person person) {
-        return (String) register.applyStrategy(person);
-    }
-
-    @GetMapping("/testUser")
-    public String test(User person) {
-        return (String) register.applyStrategy(person);
+    public String test(@RequestBody Person person) {
+        return register.applyStrategy(person);
     }
 
 }

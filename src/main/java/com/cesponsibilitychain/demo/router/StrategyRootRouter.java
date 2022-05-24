@@ -2,7 +2,10 @@ package com.cesponsibilitychain.demo.router;
 
 
 import com.cesponsibilitychain.demo.dto.Person;
-import com.cesponsibilitychain.demo.handler.*;
+import com.cesponsibilitychain.demo.handler.impl.DefaultHandler;
+import com.cesponsibilitychain.demo.handler.impl.MiddleAgedHandler;
+import com.cesponsibilitychain.demo.handler.impl.OldHandler;
+import com.cesponsibilitychain.demo.handler.impl.YouthHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +20,10 @@ import org.springframework.stereotype.Component;
  * @intention: 根路由，以此节点为入口，调用其applyStrategy方法，内部根据路由实现转发处理
  */
 @Component
-@SuppressWarnings("rawtypes")
-public class StrategyRootRouter extends AbstractStrategyRouter {
+public class StrategyRootRouter extends AbstractStrategyRouter<Person, String> {
     private static final Logger log = LoggerFactory.getLogger(StrategyRootRouter.class);
+
+    private final DefaultHandler defaultHandler;
 
     private final YouthHandler youthHandler;
 
@@ -31,10 +35,12 @@ public class StrategyRootRouter extends AbstractStrategyRouter {
 
 
     @Autowired
-    public StrategyRootRouter(YouthHandler youthHandler,
+    public StrategyRootRouter(DefaultHandler defaultHandler, YouthHandler youthHandler,
                               TeenagerHandlerRouter teenagerHandlerRouter,
                               MiddleAgedHandler middleAgedHandler,
                               OldHandler oldHandler) {
+        super(defaultHandler);
+        this.defaultHandler = defaultHandler;
         this.youthHandler = youthHandler;
         this.teenagerHandlerRouter = teenagerHandlerRouter;
         this.middleAgedHandler = middleAgedHandler;
@@ -42,13 +48,13 @@ public class StrategyRootRouter extends AbstractStrategyRouter {
     }
 
     @Override
-    protected StrategyMapper registerStrategyMapper() {
-        return param -> {
-            if (param instanceof Person) {
-                int age = ((Person) param).getAge();
+    protected StrategyMapper<Person, String> registerStrategyMapper() {
+        return person -> {
+            if (person != null) {
+                int age = person.getAge();
                 if (age <= 0) {
                     log.error("req param is error");
-                    return StrategyHandler.DEFAULT;
+                    return defaultHandler;
                 }
                 if (age < 18) {
                     return youthHandler;
@@ -61,7 +67,7 @@ public class StrategyRootRouter extends AbstractStrategyRouter {
                 }
             } else {
                 log.error("Strategy can not deal this req!");
-                return StrategyHandler.DEFAULT;
+                return defaultHandler;
             }
         };
     }

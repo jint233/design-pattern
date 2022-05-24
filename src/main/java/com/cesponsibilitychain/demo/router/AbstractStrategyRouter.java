@@ -22,24 +22,16 @@ import java.util.Objects;
 public abstract class AbstractStrategyRouter<T, R> {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractStrategyRouter.class);
+    protected StrategyHandler<T, R> defaultStrategyHandler;
+    private StrategyMapper<T, R> strategyMapper;
 
-    /**
-     * 策略映射器，根据指定的入参路由到对应的策略处理者。
-     *
-     * @param <T> 策略的入参类型
-     * @param <R> 策略的返回值类型
-     */
-    public interface StrategyMapper<T, R> {
-        /**
-         * 根据入参获取到对应的策略处理者。可通过 if-else 实现，也可通过 Map 实现。
-         *
-         * @param param 入参
-         * @return 策略处理者
-         */
-        StrategyHandler<T, R> get(T param);
+    private AbstractStrategyRouter() {
+
     }
 
-    private StrategyMapper<T, R> strategyMapper;
+    protected AbstractStrategyRouter(StrategyHandler<T, R> defaultHandler) {
+        this.defaultStrategyHandler = defaultHandler;
+    }
 
     /**
      * 类初始化时注册分发策略 Mapper
@@ -49,9 +41,6 @@ public abstract class AbstractStrategyRouter<T, R> {
         strategyMapper = registerStrategyMapper();
         Objects.requireNonNull(strategyMapper, "strategyMapper cannot be null");
     }
-
-    @SuppressWarnings("unchecked")
-    protected final StrategyHandler<T, R> defaultStrategyHandler = StrategyHandler.DEFAULT;
 
     /**
      * 执行策略，框架会自动根据策略分发至下游的 Handler 进行处理
@@ -75,5 +64,21 @@ public abstract class AbstractStrategyRouter<T, R> {
      * @return 分发逻辑 Mapper 对象
      */
     protected abstract StrategyMapper<T, R> registerStrategyMapper();
+
+    /**
+     * 策略映射器，根据指定的入参路由到对应的策略处理者。
+     *
+     * @param <T> 策略的入参类型
+     * @param <R> 策略的返回值类型
+     */
+    public interface StrategyMapper<T, R> {
+        /**
+         * 根据入参获取到对应的策略处理者。可通过 if-else 实现，也可通过 Map 实现。
+         *
+         * @param param 入参
+         * @return 策略处理者
+         */
+        StrategyHandler<T, R> get(T param);
+    }
 
 }

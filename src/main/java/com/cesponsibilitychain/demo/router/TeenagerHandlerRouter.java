@@ -2,9 +2,10 @@ package com.cesponsibilitychain.demo.router;
 
 
 import com.cesponsibilitychain.demo.dto.Person;
-import com.cesponsibilitychain.demo.handler.FemaleHandler;
-import com.cesponsibilitychain.demo.handler.MaleHandler;
 import com.cesponsibilitychain.demo.handler.StrategyHandler;
+import com.cesponsibilitychain.demo.handler.impl.DefaultHandler;
+import com.cesponsibilitychain.demo.handler.impl.FemaleHandler;
+import com.cesponsibilitychain.demo.handler.impl.MaleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +27,23 @@ import java.util.HashMap;
  * 在拦截逻辑后直接调用本身 Router 的 public R applyStrategy(T param) 方法路由给下游节点即可。
  */
 @Component
-@SuppressWarnings({"unchecked","rawtypes"})
-public class TeenagerHandlerRouter extends AbstractStrategyRouter implements StrategyHandler {
+public class TeenagerHandlerRouter extends AbstractStrategyRouter<Person, String>
+        implements StrategyHandler<Person, String> {
     private static final Logger log = LoggerFactory.getLogger(TeenagerHandlerRouter.class);
 
     private final FemaleHandler femaleHandler;
     private final MaleHandler maleHandler;
-    private HashMap<String, StrategyHandler> handlerMap;
+    private final DefaultHandler defaultHandler;
+    private HashMap<String, StrategyHandler<Person, String>> handlerMap;
 
 
     @Autowired
     public TeenagerHandlerRouter(FemaleHandler femaleHandler,
-                                 MaleHandler maleHandler) {
+                                 MaleHandler maleHandler, DefaultHandler defaultHandler) {
+        super(defaultHandler);
         this.femaleHandler = femaleHandler;
         this.maleHandler = maleHandler;
+        this.defaultHandler = defaultHandler;
     }
 
     /**
@@ -53,19 +57,18 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter implements Str
     }
 
     @Override
-    public Object apply(Object param) {
-        Person person = (Person) param;
+    public String apply(Person person) {
         if (!"male".equalsIgnoreCase(person.getSex()) &&
                 !"female".equalsIgnoreCase(person.getSex())) {
             log.error("sex property is error！");
-            return StrategyHandler.DEFAULT.apply(param);
+            return defaultHandler.apply(person);
         }
-        return applyStrategy(param);
+        return applyStrategy(person);
     }
 
     @Override
-    protected StrategyMapper registerStrategyMapper() {
-        return param -> handlerMap.get(((Person) param).getSex().toLowerCase());
+    protected StrategyMapper<Person, String> registerStrategyMapper() {
+        return param -> handlerMap.get(param.getSex().toLowerCase());
     }
 
 }

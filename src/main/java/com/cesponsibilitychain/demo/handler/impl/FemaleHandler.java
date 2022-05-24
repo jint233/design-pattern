@@ -1,7 +1,8 @@
-package com.cesponsibilitychain.demo.handler;
+package com.cesponsibilitychain.demo.handler.impl;
 
 
 import com.cesponsibilitychain.demo.dto.Person;
+import com.cesponsibilitychain.demo.handler.StrategyHandler;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,10 +15,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SuppressWarnings("rawtypes")
-public class FemaleHandler implements StrategyHandler {
+public class FemaleHandler implements StrategyHandler<Person, String> {
     @Override
-    public Object apply(Object param) {
-        Person person = (Person) param;
+    public String apply(Person person) {
         return "I am " + person.getName() + ", " +
                 person.getAge() + " years old" + ". " +
                 "I am teenager and female";
