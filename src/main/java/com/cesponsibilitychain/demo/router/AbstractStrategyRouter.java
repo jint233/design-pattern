@@ -60,6 +60,9 @@ public abstract class AbstractStrategyRouter<T, R> {
 
     /**
      * 抽象方法，需要子类实现策略的分发逻辑
+     * 实现类中需要构造defaultStrategyHandler
+     * 该类中对无匹配策略时执行defaultStrategyHandler的处理流程
+     * 实现类只需要关心业务逻辑即可
      *
      * @return 分发逻辑 Mapper 对象
      */

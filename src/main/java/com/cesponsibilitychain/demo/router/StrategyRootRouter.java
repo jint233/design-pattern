@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * @program demo
  * @description: 策略 + 责任链模式
@@ -35,7 +37,8 @@ public class StrategyRootRouter extends AbstractStrategyRouter<Person, String> {
 
 
     @Autowired
-    public StrategyRootRouter(DefaultHandler defaultHandler, YouthHandler youthHandler,
+    public StrategyRootRouter(DefaultHandler defaultHandler,
+                              YouthHandler youthHandler,
                               TeenagerHandlerRouter teenagerHandlerRouter,
                               MiddleAgedHandler middleAgedHandler,
                               OldHandler oldHandler) {
@@ -50,24 +53,22 @@ public class StrategyRootRouter extends AbstractStrategyRouter<Person, String> {
     @Override
     protected StrategyMapper<Person, String> registerStrategyMapper() {
         return person -> {
-            if (person != null) {
-                int age = person.getAge();
-                if (age <= 0) {
-                    log.error("req param is error");
-                    return defaultHandler;
-                }
-                if (age < 18) {
-                    return youthHandler;
-                } else if (age < 35) {
-                    return teenagerHandlerRouter;
-                } else if (age < 60) {
-                    return middleAgedHandler;
-                } else {
-                    return oldHandler;
-                }
-            } else {
-                log.error("Strategy can not deal this req!");
+            if (Objects.isNull(person)) {
+                return null;
+            }
+            int age = person.getAge();
+            if (age <= 0) {
+                log.error("req param is error");
                 return defaultHandler;
+            }
+            if (age < 18) {
+                return youthHandler;
+            } else if (age < 35) {
+                return teenagerHandlerRouter;
+            } else if (age < 60) {
+                return middleAgedHandler;
+            } else {
+                return oldHandler;
             }
         };
     }

@@ -33,17 +33,16 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter<Person, String
 
     private final FemaleHandler femaleHandler;
     private final MaleHandler maleHandler;
-    private final DefaultHandler defaultHandler;
     private HashMap<String, StrategyHandler<Person, String>> handlerMap;
 
 
     @Autowired
     public TeenagerHandlerRouter(FemaleHandler femaleHandler,
-                                 MaleHandler maleHandler, DefaultHandler defaultHandler) {
+                                 MaleHandler maleHandler,
+                                 DefaultHandler defaultHandler) {
         super(defaultHandler);
         this.femaleHandler = femaleHandler;
         this.maleHandler = maleHandler;
-        this.defaultHandler = defaultHandler;
     }
 
     /**
@@ -58,11 +57,6 @@ public class TeenagerHandlerRouter extends AbstractStrategyRouter<Person, String
 
     @Override
     public String apply(Person person) {
-        if (!"male".equalsIgnoreCase(person.getSex()) &&
-                !"female".equalsIgnoreCase(person.getSex())) {
-            log.error("sex property is error！");
-            return defaultHandler.apply(person);
-        }
         return applyStrategy(person);
     }
 
